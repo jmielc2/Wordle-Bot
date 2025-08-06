@@ -9,9 +9,9 @@
 typedef struct {
     const char* filename;
     char words[BANK_SIZE * WORD_LEN];
-    int total_word_count;
-    int _page_start_index;
-    int _num_loaded_words;
+    long total_word_count;
+    long _page_start_index;
+    long _num_loaded_words;
     int _num_cursors;
 } WB;
 

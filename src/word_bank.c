@@ -4,11 +4,10 @@
 
 #include "word_bank.h"
 
-static void LoadWordBankPageAtIndex(WB* wb, int index) {
+static void LoadWordBankPageAtIndex(WB* wb, long index) {
     // Clear word bank
     index = (index / BANK_SIZE) * BANK_SIZE;
     wb->_page_start_index = index;
-    wb->_num_loaded_words = 0;
     memset(&wb->words, '\0', sizeof(wb->words));
 
     // Read
@@ -17,22 +16,12 @@ static void LoadWordBankPageAtIndex(WB* wb, int index) {
         printf("ERROR: Word bank file '%s' no longer exists.\n", wb->filename);
         return;
     }
-    size_t word_size = WORD_LEN + 1;
-    char* buf = malloc(sizeof(char) * word_size);
-    int i = 0;
-    while (i < index) {
-        getline(&buf, &word_size, file);
-        i++;
-    }
-    i = 0;
-    while (i < BANK_SIZE && index + i < wb->total_word_count) {
-        getline(&buf, &word_size, file);
-        memccpy(&wb->words[i * WORD_LEN], buf, '\n', sizeof(buf));
+    wb->_num_loaded_words = (index + BANK_SIZE > wb->total_word_count)? wb->total_word_count - index : BANK_SIZE;
+    fseek(file, index * WORD_LEN, SEEK_SET);
+    fread(&wb->words[0], sizeof(char) * WORD_LEN, wb->_num_loaded_words, file);
+    for (int i = 0; i < wb->_num_loaded_words; i++) {
         wb->words[i * WORD_LEN + 5] = '\0';
-        wb->_num_loaded_words++;
-        i++;
     }
-    free(buf);
     fclose(file);
 }
 
@@ -50,7 +39,7 @@ static void LoadNextWordBankPage(WB* wb) {
 
 static void LoadPrevWordBankPage(WB* wb) {
     // Preliminary checks
-    int new_start_index = wb->_page_start_index - BANK_SIZE;
+    const long new_start_index = wb->_page_start_index - BANK_SIZE;
     if (new_start_index < 0) {
         printf("INFO: No prev page to load.\n");
         return;
@@ -72,20 +61,15 @@ int InitWordBank(const char* filename, WB* wb) {
         printf("ERROR: Word bank file '%s' not found.\n", filename);    
         return 0;
     }
-    size_t word_size = WORD_LEN + 1;
-    char* buf = malloc(sizeof(char) * word_size);
-    for (int i = 0; i < BANK_SIZE && !feof(file); i++) {
-        getline(&buf, &word_size, file);
-        memccpy(&wb->words[i * WORD_LEN], buf, '\n', sizeof(buf));
+    fseek(file, 0, SEEK_END);
+    const long pos = ftell(file);
+    wb->total_word_count = pos / WORD_LEN;
+    fseek(file, 0, SEEK_SET);
+    wb->_num_loaded_words = (wb->total_word_count < BANK_SIZE)? wb->total_word_count : BANK_SIZE;
+    fread(&wb->words[0], sizeof(char) * WORD_LEN, wb->_num_loaded_words, file);
+    for (int i = 0; i < wb->_num_loaded_words; i++) {
         wb->words[i * WORD_LEN + 5] = '\0';
-        wb->_num_loaded_words++;
-        wb->total_word_count++;
     }
-    while (!feof(file)) {
-        getline(&buf, &word_size, file);
-        wb->total_word_count++;
-    }
-    free(buf);
     fclose(file);
     return 1;
 }
