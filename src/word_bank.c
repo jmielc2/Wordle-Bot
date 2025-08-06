@@ -1,8 +1,8 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "word_bank.h"
+#include "util.h"
 
 static void LoadWordBankPageAtIndex(WB* wb, long index) {
     // Clear word bank
@@ -11,18 +11,18 @@ static void LoadWordBankPageAtIndex(WB* wb, long index) {
     memset(&wb->words, '\0', sizeof(wb->words));
 
     // Read
-    FILE* file = fopen(wb->filename, "r");
+    FILE* file = open_file(wb->filename, "r");
     if (file == NULL) {
         printf("ERROR: Word bank file '%s' no longer exists.\n", wb->filename);
         return;
     }
     wb->_num_loaded_words = (index + BANK_SIZE > wb->total_word_count)? wb->total_word_count - index : BANK_SIZE;
-    fseek(file, index * WORD_LEN, SEEK_SET);
-    fread(&wb->words[0], sizeof(char) * WORD_LEN, wb->_num_loaded_words, file);
+    seek_file(file, index * WORD_LEN, SEEK_SET);
+    read_file(&wb->words[0], sizeof(char) * WORD_LEN, wb->_num_loaded_words, file);
     for (int i = 0; i < wb->_num_loaded_words; i++) {
         wb->words[i * WORD_LEN + 5] = '\0';
     }
-    fclose(file);
+    close_file(file);
 }
 
 static void LoadNextWordBankPage(WB* wb) {
@@ -56,21 +56,21 @@ int InitWordBank(const char* filename, WB* wb) {
     wb->_num_cursors = 0;
     wb->_num_loaded_words = 0;
     wb->total_word_count = 0;
-    FILE* file = fopen(filename, "r");
+    FILE* file = open_file(filename, "r");
     if (file == NULL) {
         printf("ERROR: Word bank file '%s' not found.\n", filename);    
         return 0;
     }
-    fseek(file, 0, SEEK_END);
-    const long pos = ftell(file);
+    seek_file(file, 0, SEEK_END);
+    const long pos = tell_file(file);
     wb->total_word_count = pos / WORD_LEN;
-    fseek(file, 0, SEEK_SET);
+    seek_file(file, 0, SEEK_SET);
     wb->_num_loaded_words = (wb->total_word_count < BANK_SIZE)? wb->total_word_count : BANK_SIZE;
-    fread(&wb->words[0], sizeof(char) * WORD_LEN, wb->_num_loaded_words, file);
+    read_file(&wb->words[0], sizeof(char) * WORD_LEN, wb->_num_loaded_words, file);
     for (int i = 0; i < wb->_num_loaded_words; i++) {
         wb->words[i * WORD_LEN + 5] = '\0';
     }
-    fclose(file);
+    close_file(file);
     return 1;
 }
 
