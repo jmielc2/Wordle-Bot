@@ -1,6 +1,4 @@
-from word_value_evaluator import WordValueEvaluator
-
-class ITEvaluator(WordValueEvaluator):
+class ITEvaluator:
     
-    def __init__(self):
+    def evaluate_word(word, count_matrix):
         pass
