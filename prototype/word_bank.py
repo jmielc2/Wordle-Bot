@@ -17,6 +17,10 @@ class WordBank:
     def index(self):
         return self._index
 
+    @property
+    def words(self):
+        return self._words
+
     def loadWordBank(self, filename):
         self.resetWordBank()
         file = open(filename)
@@ -30,14 +34,14 @@ class WordBank:
         i = int(i)
         i = self._index if i == -1 else i
         if (self.size == 0):
-            raise RuntimeError("Word bank is empty. No word to read")
+            raise RuntimeError("Word bank is empty.")
         if (not self.__isIndexInBounds(i)):
-            raise IndexError("Index out of world bank bounds")
+            raise IndexError("Index out of world bank bounds.")
         return self._words[i]
     
     def next(self):
         self._index += 1
-        if (self.size == self._index):
+        if (self.size <= self._index):
             self._index = 0
         return self.getWord()
     
@@ -49,8 +53,8 @@ class WordBank:
     
     def setIndex(self, i):
         i = int(i)
-        if (self.size == 0):
-            raise RuntimeError("Word bank is empty. No word to read")
+        if (self.size == 0 and i != 0):
+            raise RuntimeError("Word bank is empty.")
         if (not self.__isIndexInBounds(i)):
-            raise IndexError("Index out of world bank bounds")
+            raise IndexError("Index out of world bank bounds.")
         self._index = i
