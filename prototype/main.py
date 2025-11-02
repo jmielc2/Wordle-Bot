@@ -1,16 +1,38 @@
 from word_bank import WordBank
+from wordle_puzzle import WordlePuzzle
+from wordle_bot import WordleBot
 from my_evaluator import MyEvaluator
 from it_evaluator import ITEvaluator
-import pprint as pp
+import random
 
-def sorter(a):
-    return a[1]
+def selectRandomWord(words: list) -> str:
+    return words[int(random.random() * len(words))]
 
 if __name__ == "__main__":
     wb = WordBank("../words/wordle_words.txt")
-    cMatrix = wb.generateCountMatrix()
+    puzzle = WordlePuzzle("among")
+    bot = WordleBot(wb, MyEvaluator)
 
-    tuple_list = [(word, MyEvaluator.evaluate_word(word, cMatrix)) for word in wb.words]
-    tuple_list.sort(key=sorter)
-
-    pp.pprint(tuple_list)
+    numGuesses = 0
+    numFailed = 0
+    failedWords = []
+    numPuzzles = wb.size
+    print(f"Trialing {numPuzzles} Puzzles...\n")
+    for i in range(numPuzzles):
+        word = wb.words[i]
+        # word = selectRandomWord(wb.words)
+        puzzle.resetPuzzle(word)
+        bot.setPuzzle(puzzle)
+        print(f"Puzzle {i}: {word.upper()}")
+        results = bot.solve(verbose = True)
+        if not results[0]:
+            numFailed += 1
+            failedWords.append(word)
+        numGuesses += results[1]
+    
+    print("=== WORDLE BOT DATA ===")
+    print(f"Average Number of Guesses: {numGuesses / numPuzzles}")
+    print(f"Num Failed Puzzles: {numFailed}")
+    for word in failedWords:
+        print(f" - {word}")
+    print()
