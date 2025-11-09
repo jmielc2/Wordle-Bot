@@ -25,18 +25,21 @@ class WordlePuzzle:
     def lastGuess(self) -> str:
         if (self.numGuesses == 0):
             raise RuntimeError("Can't get last guess. No guesses made.")
-        return self._guessHistory[-1]
+        return self._guessHistory[-1][0]
+
+    @property
+    def guessHistory(self) -> list:
+        return self._guessHistory
     
     @property
     def isWon(self) -> bool:
         if self.numGuesses == 0:
             return False
-        return self._guessHistory[-1] == self._word
+        return self._guessHistory[-1][0] == self._word
 
     def makeGuess(self, guess: str) -> list:
         if self.numGuesses == 6:
             raise RuntimeError("Game over. You have only 6 guesses.")
-        self._guessHistory.append(guess)
         results = []
         for i, letter in enumerate(guess):
             if (self._word[i] == letter):
@@ -45,4 +48,5 @@ class WordlePuzzle:
                 results.append(Result.YELLOW)
             else:
                 results.append(Result.GRAY)
+        self._guessHistory.append((guess, results))
         return results

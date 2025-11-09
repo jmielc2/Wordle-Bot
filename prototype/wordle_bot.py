@@ -15,8 +15,7 @@ class WordleBot:
     def __init__(self, wb: WordBank, evaluator: WordValueEvaluator):
         self._wb = wb
         self._puzzle = None
-        cMatrix = wb.generateCountMatrix()
-        tuple_list = [(word, evaluator.evaluate_word(word, cMatrix)) for word in wb.words]
+        tuple_list = [(word, evaluator.evaluate_word(word, wb)) for word in wb.words]
         tuple_list.sort(key=WordleBot._sorter)
         self._firstGuess = tuple_list[-1][0]
         self._evaluator = evaluator
@@ -43,8 +42,7 @@ class WordleBot:
         while (not puzzle.isWon and puzzle.numGuesses < 6):
             guess = self._firstGuess
             if (puzzle.numGuesses > 0):
-                cMatrix = wb.generateCountMatrix()
-                tuple_list = [(word, evaluator.evaluate_word(word, cMatrix)) for word in wb.words]
+                tuple_list = [(word, evaluator.evaluate_word(word, wb)) for word in wb.words]
                 tuple_list.sort(key=WordleBot._sorter)
                 guess = tuple_list[-1][0]
             results = puzzle.makeGuess(guess)
