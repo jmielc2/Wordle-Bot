@@ -1,9 +1,10 @@
 from word_bank import WordBank
 from word_value_evaluator import WordValueEvaluator
+from wordle_puzzle import WordlePuzzle
 
 class NaiveEvaluator(WordValueEvaluator):
 
-    def evaluate_word(word: str, wb: WordBank) -> float:
+    def evaluate_word(word: str, puzzle: WordlePuzzle, wb: WordBank) -> float:
         value = 0.0
         count_matrix = wb.generateCountMatrix()
         for i, letter in enumerate(word):

@@ -9,14 +9,14 @@ GRAY_BLOCK_CODE = "\U00002B1B"
 GREEN_BLOCK_CODE = "\U0001F7E9"
 
 class WordleBot:
-    def _sorter(a):
-        return a[1]
+    _SORTER = lambda item: item[1]
 
     def __init__(self, wb: WordBank, evaluator: WordValueEvaluator):
+        print("Initializing wordle bot...")
         self._wb = wb
         self._puzzle = None
-        tuple_list = [(word, evaluator.evaluate_word(word, wb)) for word in wb.words]
-        tuple_list.sort(key=WordleBot._sorter)
+        tuple_list = [(word, evaluator.evaluate_word(word, None, wb)) for word in wb.words]
+        tuple_list.sort(key=WordleBot._SORTER)
         self._firstGuess = tuple_list[-1][0]
         self._evaluator = evaluator
 
@@ -42,8 +42,8 @@ class WordleBot:
         while (not puzzle.isWon and puzzle.numGuesses < 6):
             guess = self._firstGuess
             if (puzzle.numGuesses > 0):
-                tuple_list = [(word, evaluator.evaluate_word(word, wb)) for word in wb.words]
-                tuple_list.sort(key=WordleBot._sorter)
+                tuple_list = [(word, evaluator.evaluate_word(word, puzzle, wb)) for word in wb.words]
+                tuple_list.sort(key=WordleBot._SORTER)
                 guess = tuple_list[-1][0]
             results = puzzle.makeGuess(guess)
             wb = wb.refineWordBank(guess, results)

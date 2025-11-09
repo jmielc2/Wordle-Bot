@@ -11,8 +11,8 @@ def selectRandomWord(words: list) -> str:
 if __name__ == "__main__":
     wb = WordBank("../words/wordle_words.txt")
     puzzle = WordlePuzzle("among")
-    bot = WordleBot(wb, NaiveEvaluator)
-    # bot = WordleBot(wb, ITEvaluator)
+    # bot = WordleBot(wb, NaiveEvaluator)
+    bot = WordleBot(wb, ITEvaluator)
 
     numGuesses = 0
     numFailed = 0
