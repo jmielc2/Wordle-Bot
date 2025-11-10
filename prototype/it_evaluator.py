@@ -13,10 +13,11 @@ class ITEvaluator(WordValueEvaluator):
 
     def evaluate_word(word: str, puzzle: WordlePuzzle, wb: WordBank) -> float:
         sum = 0
+        count = 0
         for result in POSSIBLE_RESULTS:
             p = wb.wordResultProbability(word, result)
             if p == 0:
                 continue
-            sum += math.log2(p) * p
-        # print(f"processed {word}...")
-        return -sum
+            count += 1
+            sum += -math.log2(p) * p
+        return sum / count
