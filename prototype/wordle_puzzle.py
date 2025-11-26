@@ -1,7 +1,4 @@
-class Result:    
-    GRAY = 0
-    YELLOW = 1
-    GREEN = 2
+from util import EvaluateResultAsInt
 
 class WordlePuzzle:
 
@@ -9,7 +6,7 @@ class WordlePuzzle:
         self.resetPuzzle(word)
 
     def resetPuzzle(self, word: str = None):
-        if (word):
+        if word:
             self._word = word
         self._guessHistory = []
 
@@ -37,16 +34,9 @@ class WordlePuzzle:
             return False
         return self._guessHistory[-1][0] == self._word
 
-    def makeGuess(self, guess: str) -> list:
+    def makeGuess(self, guess: str) -> int:
         if self.numGuesses == 6:
             raise RuntimeError("Game over. You have only 6 guesses.")
-        results = []
-        for i, letter in enumerate(guess):
-            if self._word[i] == letter:
-                results.append(Result.GREEN)
-            elif letter in self._word:
-                results.append(Result.YELLOW)
-            else:
-                results.append(Result.GRAY)
-        self._guessHistory.append((guess, results))
-        return results
+        result = EvaluateResultAsInt(guess, self.word)
+        self._guessHistory.append((guess, result))
+        return result

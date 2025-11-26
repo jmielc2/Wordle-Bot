@@ -31,4 +31,4 @@ class CountMatrix:
                 gray_value += 1
             if not letter_in_word or word[i] == letter:
                 yellow_value += 1
-        return (gray_value, yellow_value, green_value)
+        return gray_value, yellow_value, green_value
