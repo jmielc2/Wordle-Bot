@@ -23,7 +23,7 @@ class WordlePuzzle:
     
     @property
     def lastGuess(self) -> str:
-        if (self.numGuesses == 0):
+        if self.numGuesses == 0:
             raise RuntimeError("Can't get last guess. No guesses made.")
         return self._guessHistory[-1][0]
 
@@ -42,9 +42,9 @@ class WordlePuzzle:
             raise RuntimeError("Game over. You have only 6 guesses.")
         results = []
         for i, letter in enumerate(guess):
-            if (self._word[i] == letter):
+            if self._word[i] == letter:
                 results.append(Result.GREEN)
-            elif (letter in self._word):
+            elif letter in self._word:
                 results.append(Result.YELLOW)
             else:
                 results.append(Result.GRAY)

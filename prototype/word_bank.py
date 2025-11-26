@@ -47,27 +47,6 @@ class WordBank:
     def generateCountMatrix(self) -> CountMatrix:
         return CountMatrix(self)
 
-    def wordResultProbability(self, guess: str, results: list) -> float:
-        count = 0
-        for word in self._words:
-            valid = True
-            for i, result in enumerate(results):
-                letter = guess[i]
-                if result == Result.GRAY:
-                    valid = letter not in word
-                elif result == Result.YELLOW:
-                    valid = letter in word and letter != word[i]
-                elif result == Result.GREEN:
-                    valid = letter == word[i]
-                else:
-                    raise RuntimeError("Invalid result given.")
-                if not valid:
-                    break
-            if valid:
-                count += 1
-
-        return count / self.size
-
     def refineWordBank(self, guess: str, results: list):
         refined_words = []
         for word in self._words:
@@ -84,3 +63,18 @@ class WordBank:
             if valid:
                 refined_words.append(word)
         return WordBank(filename = None, words = refined_words)
+
+    def getResultCounts(self, guess: str) -> list:
+        results = [0 for _ in range(pow(3, 5))]
+        for word in self._words:
+            result = 0
+            for i, letter in enumerate(guess):
+                if letter == word[i]:
+                    a = Result.GREEN
+                elif letter in word:
+                    a = Result.YELLOW
+                else:
+                    a = Result.GRAY
+                result += pow(3, i) * a
+            results[result] += 1
+        return results
