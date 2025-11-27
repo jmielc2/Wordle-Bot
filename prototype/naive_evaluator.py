@@ -1,8 +1,8 @@
 from word_bank import WordBank
-from word_value_evaluator import WordValueEvaluator
+from word_value_evaluator import EntropyEvaluator
 from wordle_puzzle import WordlePuzzle
 
-class NaiveEvaluator(WordValueEvaluator):
+class NaiveEvaluator(EntropyEvaluator):
 
     def evaluate_word(word: str, puzzle: WordlePuzzle, wb: WordBank) -> float:
         value = 0.0

@@ -1,6 +1,6 @@
 from wordle_puzzle import WordlePuzzle
 from word_bank import WordBank
-from word_value_evaluator import WordValueEvaluator
+from word_value_evaluator import EntropyEvaluator
 from util import Result
 import copy
 
@@ -16,7 +16,7 @@ RESULT_TO_UNICODE = {
 class WordleBot:
     _SORTER = lambda item: item[1]
 
-    def __init__(self, wb: WordBank, evaluator: WordValueEvaluator):
+    def __init__(self, wb: WordBank, evaluator: EntropyEvaluator):
         print("Initializing wordle bot...")
         self._wb = wb
         self._puzzle = None

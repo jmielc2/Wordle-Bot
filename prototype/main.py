@@ -25,15 +25,13 @@ if __name__ == "__main__":
         puzzle.resetPuzzle(word)
         bot.setPuzzle(puzzle)
         print(f"Puzzle {i}: {word.upper()}")
-        results = bot.solve(verbose = True)
-        if not results[0]:
+        result = bot.solve(verbose = True)
+        if not result[0]:
             numFailed += 1
             failedWords.append(word)
-        numGuesses += results[1]
+        numGuesses += result[1]
     
     print("=== WORDLE BOT DATA ===")
     print(f"Average Number of Guesses: {numGuesses / numPuzzles}")
-    print(f"Num Failed Puzzles: {numFailed}")
-    for word in failedWords:
-        print(f" - {word}")
-    print()
+    print(f"Number of Failed Puzzles: {numFailed}")
+    print(f"Failed Puzzles: {failedWords}")

@@ -1,5 +1,5 @@
 from count_matrix import CountMatrix
-from util import EvaluateResult, EvaluateResultAsInt, Result
+from util import EvaluateResultAsInt
 from typing import Optional
 
 class WordBank:
