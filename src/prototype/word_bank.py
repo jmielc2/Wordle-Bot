@@ -12,9 +12,6 @@ class WordBank:
         else:
             self.loadWordBank(filename, words = words)
 
-    def _isIndexInBounds(self, i):
-        return 0 <= i < self.size
-
     @property
     def size(self) -> int:
         return len(self._words)
@@ -40,7 +37,7 @@ class WordBank:
         i = self._index if i == -1 else i
         if self.size == 0:
             raise RuntimeError("Word bank is empty.")
-        if not self._isIndexInBounds(i):
+        if not 0 <= i < self.size:
             raise IndexError("Index out of world bank bounds.")
         return self._words[i]
     

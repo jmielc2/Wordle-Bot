@@ -1,3 +1,5 @@
+from typing import Any
+
 from wordle_puzzle import WordlePuzzle
 from word_bank import WordBank
 from word_value_evaluator import EntropyEvaluator
@@ -36,7 +38,9 @@ class WordleBot:
     def setPuzzle(self, puzzle: WordlePuzzle):
         self._puzzle = puzzle
         
-    def solve(self, verbose = True) -> tuple:
+    def solve(self, verbose = True) -> tuple[Any, Any] | None:
+        if self._puzzle is None:
+            return None
         puzzle = self._puzzle
         wb = copy.deepcopy(self._wb)
         evaluator = self._evaluator

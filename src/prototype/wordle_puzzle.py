@@ -2,7 +2,7 @@ from util import EvaluateResultAsInt
 
 class WordlePuzzle:
 
-    def __init__(self, word: str):
+    def __init__(self, word: str = None):
         self.resetPuzzle(word)
 
     def resetPuzzle(self, word: str = None):
