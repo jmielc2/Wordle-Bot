@@ -1,18 +1,18 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <stdio.h>
+#include "word_bank.h"
 
-// Wrappers around system calls. Used for mocking in tests
+#define GRAY 0
+#define YELLOW 1
+#define GREEN 2
+#define NONE 3
 
-FILE* open_file(const char* filename, const char* mode);
+typedef struct {
+    int result[WORD_LEN - 1];
+    int result_as_int;
+} Result;
 
-int seek_file(FILE* file, long offset, int whence);
-
-long tell_file(FILE* file);
-
-size_t read_file(void* dest, size_t size, size_t num_items, FILE* file);
-
-int close_file(FILE* file);
+extern void EvaluateResult(Result* result, const char* a, const char* b);
 
 #endif

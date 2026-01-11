@@ -1,10 +1,8 @@
 #ifndef WORD_BANK
 #define WORD_BANK
 
-#include "stdio.h"
-
 #define WORD_LEN 6
-#define BANK_SIZE 6
+#define BANK_SIZE 1024
 
 typedef struct {
     const char* filename;

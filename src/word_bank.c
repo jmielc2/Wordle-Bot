@@ -1,28 +1,32 @@
+#include "word_bank.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
-#include "word_bank.h"
 #include "util.h"
 
 static void LoadWordBankPageAtIndex(WB* wb, long index) {
     // Clear word bank
-    index = (index / BANK_SIZE) * BANK_SIZE;
+    index = index - (index % BANK_SIZE);
     wb->_page_start_index = index;
     memset(&wb->words, '\0', sizeof(wb->words));
 
     // Read
-    FILE* file = open_file(wb->filename, "r");
+    FILE* file = fopen(wb->filename, "r");
     if (file == NULL) {
-        printf("ERROR: Word bank file '%s' no longer exists.\n", wb->filename);
+        fprintf(stderr, "ERROR: Word bank file '%s' no longer exists.\n", wb->filename);
         return;
     }
     wb->_num_loaded_words = (index + BANK_SIZE > wb->total_word_count)? wb->total_word_count - index : BANK_SIZE;
-    seek_file(file, index * WORD_LEN, SEEK_SET);
-    read_file(&wb->words[0], sizeof(char) * WORD_LEN, wb->_num_loaded_words, file);
+    fseek(file, index * (WORD_LEN + 1), SEEK_SET);
     for (int i = 0; i < wb->_num_loaded_words; i++) {
-        wb->words[i * WORD_LEN + 5] = '\0';
+        if (fgets(&wb->words[i * WORD_LEN], WORD_LEN, file) != NULL) {
+            getc(file);
+        } else {
+            break;
+        }
     }
-    close_file(file);
+    fclose(file);
 }
 
 static void LoadNextWordBankPage(WB* wb) {
@@ -56,21 +60,25 @@ int InitWordBank(const char* filename, WB* wb) {
     wb->_num_cursors = 0;
     wb->_num_loaded_words = 0;
     wb->total_word_count = 0;
-    FILE* file = open_file(filename, "r");
+    FILE* file = fopen(filename, "r");
     if (file == NULL) {
-        printf("ERROR: Word bank file '%s' not found.\n", filename);    
+        fprintf(stderr, "ERROR: Word bank file '%s' not found.\n", filename);
         return 0;
     }
-    seek_file(file, 0, SEEK_END);
-    const long pos = tell_file(file);
-    wb->total_word_count = pos / WORD_LEN;
-    seek_file(file, 0, SEEK_SET);
-    wb->_num_loaded_words = (wb->total_word_count < BANK_SIZE)? wb->total_word_count : BANK_SIZE;
-    read_file(&wb->words[0], sizeof(char) * WORD_LEN, wb->_num_loaded_words, file);
-    for (int i = 0; i < wb->_num_loaded_words; i++) {
-        wb->words[i * WORD_LEN + 5] = '\0';
+    for (int i = 0; i < BANK_SIZE; i++) {
+        if (fgets(&wb->words[i * WORD_LEN], WORD_LEN, file) != NULL) {
+            getc(file);
+            wb->_num_loaded_words++;
+        } else {
+            break;
+        }
     }
-    close_file(file);
+    wb->total_word_count = wb->_num_loaded_words;
+    char buf[WORD_LEN + 1];
+    while (fgets(buf, WORD_LEN + 1, file)) {
+        wb->total_word_count++;
+    }
+    fclose(file);
     return 1;
 }
 
@@ -131,7 +139,6 @@ void MoveToPrevWord(Cursor* cursor) {
     if (cursor->wb_index == wb->_page_start_index - 1 && cursor->wb_index != -1) {
         LoadPrevWordBankPage(wb);
     }
-
 }
 
 void MoveToIndex(Cursor* cursor, int index) {
@@ -143,7 +150,7 @@ void MoveToIndex(Cursor* cursor, int index) {
         } else {
             LoadWordBankPageAtIndex(wb, index);
         }
-    } else if (index > wb->_page_start_index + wb->_num_loaded_words) {
+    } else if (index >= wb->_page_start_index + wb->_num_loaded_words) {
         if (index >= wb->total_word_count) {
             index = wb->total_word_count;
             LoadWordBankPageAtIndex(wb, index - 1);
