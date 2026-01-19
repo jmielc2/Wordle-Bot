@@ -6,17 +6,18 @@
 #include "util.h"
 
 static void LoadWordBankPageAtIndex(WB* wb, long index) {
+    // Open File
+    FILE* file = fopen(wb->filename, "r");
+    if (file == NULL) {
+        return;
+    }
+
     // Clear word bank
     index = index - (index % BANK_SIZE);
     wb->_page_start_index = index;
     memset(&wb->words, '\0', sizeof(wb->words));
 
     // Read
-    FILE* file = fopen(wb->filename, "r");
-    if (file == NULL) {
-        fprintf(stderr, "ERROR: Word bank file '%s' no longer exists.\n", wb->filename);
-        return;
-    }
     wb->_num_loaded_words = (index + BANK_SIZE > wb->total_word_count)? wb->total_word_count - index : BANK_SIZE;
     fseek(file, index * (WORD_LEN + 1), SEEK_SET);
     for (int i = 0; i < wb->_num_loaded_words; i++) {
@@ -82,6 +83,15 @@ int InitWordBank(const char* filename, WB* wb) {
     return 1;
 }
 
+static void InitSimpleWordBank(WB* wb) {
+    wb->filename = NULL;
+    memset(&wb->words, '\0', sizeof(wb->words));
+    wb->_page_start_index = 0;
+    wb->_num_cursors = 0;
+    wb->_num_loaded_words = 0;
+    wb->total_word_count = 0;
+}
+
 int DestroyWordBank(WB* wb) {
     if (wb->_num_cursors > 0) {
         printf("ERROR: Word Bank can't be closed until are associated cursors are closed.\n");
@@ -109,10 +119,14 @@ int DestroyWordBankCursor(Cursor* cursor) {
 }
 
 const char* GetWord(const Cursor* cursor) {
-    if (cursor->wb_index == cursor->_wb->total_word_count || cursor->wb_index == -1) {
+    WB* wb = cursor->_wb;
+    if (cursor->wb_index >= wb->total_word_count || cursor->wb_index <= -1) {
         return "\0";
     }
-    return &cursor->_wb->words[(cursor->wb_index - cursor->_wb->_page_start_index) * WORD_LEN];
+    if (cursor->wb_index < wb->_page_start_index || cursor->wb_index >= wb->_page_start_index + BANK_SIZE) {
+        LoadWordBankPageAtIndex(wb, cursor->wb_index);
+    }
+    return &cursor->_wb->words[cursor->wb_index % BANK_SIZE * WORD_LEN];
 }
 
 void MoveToNextWord(Cursor* cursor) {
@@ -159,4 +173,22 @@ void MoveToIndex(Cursor* cursor, int index) {
         }
     }
     cursor->wb_index = index;
+}
+
+void RefineWordBank(WB* wb, const char* guess, const Result* result, WB* new_wb) {
+    Cursor cursor;
+    CreateWordBankCursor(wb, &cursor);
+    InitSimpleWordBank(new_wb);
+    while (cursor.wb_index < wb->total_word_count) {
+        Result word_result;
+        const char* word = GetWord(&cursor);
+        EvaluateResult(&word_result, guess, word);
+        MoveToNextWord(&cursor);
+        if (result->result_as_int == word_result.result_as_int) {
+            strcpy(&new_wb->words[new_wb->_num_loaded_words * WORD_LEN], word);
+            new_wb->total_word_count++;
+            new_wb->_num_loaded_words++;
+        }
+    }
+    DestroyWordBankCursor(&cursor);
 }

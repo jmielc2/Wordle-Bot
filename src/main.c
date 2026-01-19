@@ -14,7 +14,8 @@ int main(void) {
     Cursor cursor;
     CreateWordBankCursor(&wb, &cursor);
 
-
+    // Test 1
+    /*
     srand(time(NULL));
     const int wordIndex = rand() % wb.total_word_count;
 
@@ -39,6 +40,22 @@ int main(void) {
     for (i = 0; i < puzzle.num_guesses; i++) {
         printf(" - %s\n", PuzzleGetGuess(&puzzle, i));
     }
+    */
+
+    // Test 2
+    Result result;
+    EvaluateResult(&result, "aback", "agape");
+    WB new_wb;
+    Cursor new_cursor;
+    RefineWordBank(&wb, "aback", &result, &new_wb);
+    CreateWordBankCursor(&new_wb, &new_cursor);
+    printf("Refined Word Bank:\n");
+    while (new_cursor.wb_index < new_wb.total_word_count) {
+        printf(" - %s\n", GetWord(&new_cursor));
+        MoveToNextWord(&new_cursor);
+    }
+    DestroyWordBankCursor(&new_cursor);
+    DestroyWordBank(&new_wb);
 
     DestroyWordBankCursor(&cursor);
     DestroyWordBank(&wb);

@@ -4,6 +4,8 @@
 #define WORD_LEN 6
 #define BANK_SIZE 1024
 
+#include "util.h"
+
 typedef struct {
     const char* filename;
     char words[BANK_SIZE * WORD_LEN];
@@ -33,5 +35,7 @@ extern void MoveToNextWord(Cursor* cursor);
 extern void MoveToPrevWord(Cursor* cursor);
 
 extern void MoveToIndex(Cursor* cursor, int index);
+
+extern void RefineWordBank(WB* wb, const char* guess, const Result* result, WB* new_wb);
 
 #endif
