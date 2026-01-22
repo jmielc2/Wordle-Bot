@@ -11,10 +11,11 @@
 typedef struct {
     WB* wb;
     char first_guess[WORD_LEN];
+    char next_guess[WORD_LEN];
 } WordleBot;
 
-void InitWordleBot(WordleBot* bot, WB* wb);
+extern void InitWordleBot(WordleBot* bot, WB* wb);
 
-void WordleBotSolvePuzzle(WordleBot* bot, Puzzle* puzzle);
+extern void WordleBotSolvePuzzle(WordleBot* bot, Puzzle* puzzle);
 
 #endif

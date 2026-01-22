@@ -10,6 +10,8 @@ typedef struct Result Result;
 #define GREEN 2
 #define NONE 3
 
+#define MAX_RESULTS 243  // 3^5
+
 struct Result {
     int result[WORD_LEN - 1];
     int result_as_int;

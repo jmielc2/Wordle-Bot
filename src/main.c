@@ -4,6 +4,7 @@
 
 #include "word_bank.h"
 #include "puzzle.h"
+#include "wordle_bot.h"
 
 int main(void) {
     WB wb;
@@ -43,19 +44,31 @@ int main(void) {
     */
 
     // Test 2
-    Result result;
-    EvaluateResult(&result, "aback", "agape");
-    WB new_wb;
-    Cursor new_cursor;
-    RefineWordBank(&wb, "aback", &result, &new_wb);
-    CreateWordBankCursor(&new_wb, &new_cursor);
-    printf("Refined Word Bank:\n");
-    while (new_cursor.wb_index < new_wb.total_word_count) {
-        printf(" - %s\n", GetWord(&new_cursor));
-        MoveToNextWord(&new_cursor);
-    }
-    DestroyWordBankCursor(&new_cursor);
-    DestroyWordBank(&new_wb);
+    // Result result;
+    // EvaluateResult(&result, "aaaaa", "bbbbb");
+    // WB new_wb;
+    // Cursor new_cursor;
+    // RefineWordBank(&wb, "aback", &result, &new_wb);
+    // CreateWordBankCursor(&new_wb, &new_cursor);
+    // printf("Refined Word Bank:\n");
+    // while (new_cursor.wb_index < new_wb.total_word_count) {
+    //     printf(" - %s\n", GetWord(&new_cursor));
+    //     MoveToNextWord(&new_cursor);
+    // }
+    // DestroyWordBankCursor(&new_cursor);
+    // DestroyWordBank(&new_wb);
+
+
+    // Test 3
+    // srand(time(NULL));
+    // const int wordIndex = rand() % wb.total_word_count;
+    // MoveToIndex(&cursor, wordIndex);
+
+    // Puzzle puzzle;
+    // InitPuzzle(&puzzle, GetWord(&cursor));
+
+    WordleBot bot;
+    InitWordleBot(&bot, &wb);
 
     DestroyWordBankCursor(&cursor);
     DestroyWordBank(&wb);
