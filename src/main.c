@@ -1,3 +1,4 @@
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -8,7 +9,7 @@
 
 int main(void) {
     WB wb;
-    if (!InitWordBank("../words/wordle_words.txt", &wb)) {
+    if (!InitWordBank("../words/wordle-words.txt", &wb)) {
         printf("Failed to initialize Word Bank.\n");
         return 1;
     }
@@ -69,6 +70,12 @@ int main(void) {
 
     WordleBot bot;
     InitWordleBot(&bot, &wb);
+    Puzzle puzzle;
+    while (cursor.wb_index < wb.total_word_count) {
+        InitPuzzle(&puzzle, GetWord(&cursor));
+        WordleBotSolvePuzzle(&bot, &puzzle);
+        MoveToNextWord(&cursor);
+    }
 
     DestroyWordBankCursor(&cursor);
     DestroyWordBank(&wb);

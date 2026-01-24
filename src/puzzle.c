@@ -47,7 +47,7 @@ int PuzzleGameIsWon(Puzzle* puzzle) {
 }
 
 void PuzzleMakeGuess(Puzzle* puzzle, const char* guess, Result* result) {
-    if (puzzle->num_guesses == 6) {
+    if (puzzle->num_guesses == NUM_GUESSES) {
         fprintf(stderr, "Game over. You only have %i guesses.\n", NUM_GUESSES);
         return;
     }

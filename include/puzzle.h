@@ -6,7 +6,7 @@
 #include "util.h"
 #include "word_bank.h"
 
-#define NUM_GUESSES 5
+#define NUM_GUESSES 6
 
 typedef struct {
     Result result;

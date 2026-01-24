@@ -2,7 +2,7 @@
 #define WORD_BANK
 
 #define WORD_LEN 6
-#define BANK_SIZE 1024
+#define BANK_SIZE 2048
 
 #include "util.h"
 

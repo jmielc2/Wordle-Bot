@@ -9,7 +9,7 @@ def selectRandomWord(words: list) -> str:
     return words[int(random.random() * len(words))]
 
 if __name__ == "__main__":
-    file = "../../words/wordle_words.txt"
+    file = "../../words/wordle-words.txt"
     if len(sys.argv) == 2:
         file = sys.argv[1]
     elif len(sys.argv) > 2:

@@ -3,11 +3,12 @@
 //
 
 #include "wordle_bot.h"
+#include "puzzle.h"
 
 #include <math.h>
 #include <stdio.h>
 
-static char* RESULT_TO_UNICODE[3] = { "\U00002B1B", "\U0001F7E8", "\U0001F7E9"};
+static const char* RESULT_TO_UNICODE[3] = { "a", "b", "c" };
 
 typedef struct {
     char word[WORD_LEN];
@@ -18,11 +19,10 @@ static void PrintResult(const int result) {
     int v = result;
     for (int i = 0; i < 5; i++) {
         const int r = v % 3;
-        printf("%s", RESULT_TO_UNICODE[r]);
+        printf(RESULT_TO_UNICODE[r]);
         v -= r;
         v /= 3;
     }
-    printf("\n");
 }
 
 static float ItEvaluator(const char* word, WB* wb) {
@@ -50,11 +50,10 @@ static void SortEntropies(Entropy* entropyBuffer, const int low, const int high)
     SortEntropies(entropyBuffer, mid + 1, high);
 
     // Merge
+    const int numElements = high - low + 1;
     int i = low, j = mid + 1, k = 0;
-    Entropy mergeBuffer[high - low + 1];
-    for (; k < high - low + 1; k++) {
-        // Entropy a = entropyBuffer[i];
-        // Entropy b = entropyBuffer[j];
+    Entropy mergeBuffer[numElements];
+    for (; k < numElements; k++) {
         if (entropyBuffer[i].value < entropyBuffer[j].value && i <= mid) {
             mergeBuffer[k] = entropyBuffer[i];
             i++;
@@ -70,7 +69,7 @@ static void SortEntropies(Entropy* entropyBuffer, const int low, const int high)
         i++;
         k++;
     }
-    memcpy(&entropyBuffer[low], mergeBuffer, high - low + 1 * sizeof(Entropy));
+    memcpy(&entropyBuffer[low], mergeBuffer, numElements * sizeof(Entropy));
 }
 
 static void EvaluateNextGuess(WB* wb, char* nextGuess) {
@@ -88,10 +87,35 @@ static void EvaluateNextGuess(WB* wb, char* nextGuess) {
 }
 
 void InitWordleBot(WordleBot* bot, WB* wb) {
+    printf("Initializing Wordle Bot...\n");
     bot->wb = wb;
     EvaluateNextGuess(bot->wb, bot->first_guess);
 }
 
 void WordleBotSolvePuzzle(WordleBot* bot, Puzzle* puzzle) {
+    char guess[WORD_LEN];
+    Result result;
+    WB tempCopy;
+    strcpy(guess, bot->first_guess);
 
+    while (!PuzzleGameIsOver(puzzle)) {
+        if (puzzle->num_guesses > 0) {
+            EvaluateNextGuess(&bot->_wb_working_copy, guess);
+            PuzzleMakeGuess(puzzle, guess, &result);
+            RefineWordBank(&bot->_wb_working_copy, guess, &result, &tempCopy);
+            bot->_wb_working_copy = tempCopy;
+        } else {
+            PuzzleMakeGuess(puzzle, guess, &result);
+            RefineWordBank(bot->wb, guess, &result, &bot->_wb_working_copy);
+        }
+        // PrintResult(result.result_as_int);
+        // printf(" -> %s\n", guess);
+    }
+
+    if (PuzzleGameIsWon(puzzle)) {
+        printf("Hooray, wordle bot guessed %s in %i tries!\n", PuzzleGetLastGuess(puzzle), puzzle->num_guesses);
+    } else {
+        printf("Oh no! Wordle bot didn't guess %s within %i tries :(\n", puzzle->word, NUM_GUESSES);
+    }
+    printf("\n");
 }

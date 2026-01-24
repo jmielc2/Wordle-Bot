@@ -10,6 +10,7 @@
 
 typedef struct {
     WB* wb;
+    WB _wb_working_copy;
     char first_guess[WORD_LEN];
     char next_guess[WORD_LEN];
 } WordleBot;
